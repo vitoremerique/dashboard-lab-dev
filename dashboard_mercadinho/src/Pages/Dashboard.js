@@ -4,15 +4,17 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { Alert } from '@mui/material';
-
+import URLs from './config';
 function Dashboard() {
   const [produtos, setProdutos] = useState([]);
   const [produtosBaixoEstoque, setProdutosBaixoEstoque] = useState([]);
-
-  // Função para buscar os produtos da API
+  const [EstoqueTotalAtivo, setEstoqueTotalAtivo] = useState();
+  const [TotalVendidoNoMes, setTotalVendidoNoMes] = useState();
+  const url = URLs.apiUrl
+ 
   const fetchProdutos = async () => {
     try {
-      const response = await fetch('https://91da-179-124-25-9.ngrok-free.app/api/inventories');
+      const response = await fetch(url+'api/inventories');
       const data = await response.json();
       setProdutos(data);
     } catch (error) {
@@ -20,10 +22,33 @@ function Dashboard() {
     }
   };
 
-  // Função para buscar o nome do produto pelo ID
+
+  const SomaProdutosEstoque = async () => {
+    try {
+      const response = await fetch(url+'/api/vitor-2');
+      const data = await response.json();
+      setEstoqueTotalAtivo(data);
+    } catch (error) {
+      console.error('Erro ao buscar total de estoques:', error);
+    }
+  };
+
+
+  const TotalvendasMES = async () => {
+    try {
+      const response = await fetch(url+'/api/vitor-3');
+      const data = await response.json();
+      setTotalVendidoNoMes(data);
+    } catch (error) {
+      console.error('Erro ao buscar o total vendido no mes:', error);
+    }
+  };
+
+
+ 
   const fetchNomeProduto = async (produtoId) => {
     try {
-      const response = await fetch(`https://91da-179-124-25-9.ngrok-free.app/api/products/${produtoId}`);
+      const response = await fetch(url+`api/products/${produtoId}`);
       const data = await response.json();
       return data.name;
     } catch (error) {
@@ -32,7 +57,7 @@ function Dashboard() {
     }
   };
 
-  // Função para verificar estoque baixo
+  
   const checkEstoqueBaixo = async () => {
     const produtosBaixoEstoqueIds = produtos.filter(produto => produto.current_quantity <= 5).map(produto => produto.id);
     const nomesProdutosBaixoEstoque = await Promise.all(produtosBaixoEstoqueIds.map(id => fetchNomeProduto(id)));
@@ -40,15 +65,31 @@ function Dashboard() {
     setProdutosBaixoEstoque(produtosBaixoEstoqueComNome);
   };
 
+
   useEffect(() => {
     fetchProdutos();
-  }, []); // Executa somente uma vez ao montar o componente
+     
+  }, []); 
+  
+  useEffect(() => {
+    SomaProdutosEstoque()
+     
+  }, [EstoqueTotalAtivo]); 
+
+  useEffect(() => {
+    TotalvendasMES();
+     
+  }, [TotalVendidoNoMes]); 
 
   useEffect(() => {
     if (produtos.length > 0) {
       checkEstoqueBaixo();
     }
-  }, [produtos]); // Executa sempre que os produtos mudam
+  }, [produtos]); 
+
+
+
+
 
   return (
     <Grid container spacing={2}>
@@ -59,7 +100,7 @@ function Dashboard() {
               Vendas do Dia
             </Typography>
             <Typography variant="h4" component="div">
-              R$ 1000
+              R$ 40.00
             </Typography>
           </CardContent>
         </Card>
@@ -71,7 +112,7 @@ function Dashboard() {
               Produtos em Estoque
             </Typography>
             <Typography variant="h4" component="div">
-              {produtos.length}
+              {EstoqueTotalAtivo}
             </Typography>
           </CardContent>
         </Card>
@@ -84,7 +125,7 @@ function Dashboard() {
               Faturamento Mensal
             </Typography>
             <Typography variant="h4" component="div">
-              R$ 30,000
+              R$ {TotalVendidoNoMes}
             </Typography>
           </CardContent>
         </Card>

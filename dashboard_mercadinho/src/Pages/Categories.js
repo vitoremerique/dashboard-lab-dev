@@ -11,10 +11,10 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Grid from '@mui/material/Grid';
 import axios from 'axios';
-
+import URLs from './config';
 function Categories() {
-  
-  const apiUrl = 'https://91da-179-124-25-9.ngrok-free.app/api/categories/';
+  const url = URLs.apiUrl
+  const apiUrl = url+'api/categories/';
   const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);

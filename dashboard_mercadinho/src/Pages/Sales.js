@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, AreaChart, Area, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
-
+import URLs from './config';
 function Sales() {
   const [salesData, setSalesData] = useState([]);
-
+  const url = URLs.apiUrl
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('https://91da-179-124-25-9.ngrok-free.app/api/sales');
+        const response = await axios.get(url+'api/transactions');
         const salesInventories = response.data;
 
         // Mapear os dados para os formatos necessários para cada gráfico

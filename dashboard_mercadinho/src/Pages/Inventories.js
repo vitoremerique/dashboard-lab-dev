@@ -12,11 +12,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Autocomplete from '@mui/material/Autocomplete';
 import axios from 'axios';
-
+import URLs from './config';
 function Inventories() {
-  
-  const apiUrlProduct = 'https://91da-179-124-25-9.ngrok-free.app/api/products/';
-  const apiUrlInventory = 'https://91da-179-124-25-9.ngrok-free.app/api/inventories/';
+  const url = URLs.apiUrl
+  const apiUrlProduct = url+'api/products/';
+  const apiUrlInventory = url+'api/products/{}/inventories/';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);

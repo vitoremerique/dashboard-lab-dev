@@ -12,10 +12,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import MenuItem from '@mui/material/MenuItem';
 import axios from 'axios';
-
+import URLs from './config';
 function ProductSearch() {
-  const apiUrl = 'https://91da-179-124-25-9.ngrok-free.app/api/products/';
-  const categoriesUrl = 'https://91da-179-124-25-9.ngrok-free.app/api/categories/';
+  const url = URLs.apiUrl
+  const apiUrl = url+'api/products/';
+  const categoriesUrl = url+'api/categories/';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
