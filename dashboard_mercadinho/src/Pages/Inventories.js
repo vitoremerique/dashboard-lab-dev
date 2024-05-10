@@ -13,32 +13,30 @@ import DialogActions from '@mui/material/DialogActions';
 import Autocomplete from '@mui/material/Autocomplete';
 import axios from 'axios';
 import URLs from './config';
+
 function Inventories() {
   const url = URLs.apiUrl
-  const apiUrlProduct = url+'api/products/';
-  const apiUrlInventory = url+'api/products/{}/inventories/';
+  const apiUrlProduct = url + 'api/products/';
+  const apiUrlInventory = (productId) => `${url}api/products/${productId}/inventories/`;
+  
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [searchResultsInventory, setSearchResultsInventory] = useState([]);
   const [product, setProduct] = useState({
-
-    product: '',
     buy_price: '',
     sell_price: '',
     initial_quantity: '',
-    
   });
   const [recentProducts, setRecentProducts] = useState([]);
   const [notification, setNotification] = useState(null);
   const [openEditPopup, setOpenEditPopup] = useState(false);
   const [editedProduct, setEditedProduct] = useState({});
- 
 
   useEffect(() => {
     fetchRecentProduct();
-    fetchproduct();
+    fetchProduct();
   }, []);
 
   const handleChange = (event) => {
@@ -52,9 +50,9 @@ function Inventories() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      await axios.post(apiUrlInventory, product);
+      await axios.post(apiUrlInventory(product.product), product);
       setProduct({
-        product: '',
+       
         buy_price: '',
         sell_price: '',
         initial_quantity: ''
@@ -69,7 +67,7 @@ function Inventories() {
 
   const handleEdit = async (productId, newData) => {
     try {
-      await axios.put(`${apiUrlInventory}${productId}/`, newData);
+      await axios.put(`${apiUrlInventory(productId)}`, newData);
       setNotification('Estoque editado com sucesso!');
       fetchRecentProduct();
     } catch (error) {
@@ -80,7 +78,7 @@ function Inventories() {
 
   const handleDelete = async (productId) => {
     try {
-      await axios.delete(`${apiUrlInventory}${productId}`);
+      await axios.delete(`${apiUrlInventory(productId)}`);
       setNotification('Produto excluído com sucesso!');
       fetchRecentProduct();
     } catch (error) {
@@ -96,7 +94,7 @@ function Inventories() {
   const handleSearchSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.get(`${apiUrlInventory}?search=${searchQuery}`);
+      const response = await axios.get(url+`/api/products/?name__icontains=`+searchQuery);
       setSearchResultsInventory(response.data);
     } catch (error) {
       console.error('Erro ao pesquisar produtos:', error);
@@ -106,7 +104,7 @@ function Inventories() {
 
   const fetchRecentProduct = async () => {
     try {
-      const response = await axios.get(apiUrlInventory);
+      const response = await axios.get(apiUrlInventory());
       const products = await Promise.all(response.data.map(async (item) => {
         const productResponse = await axios.get(`${apiUrlProduct}${item.product}`);
         return { ...item, productName: productResponse.data.name };
@@ -118,21 +116,10 @@ function Inventories() {
     }
   };
 
-  const fetchproduct = async () => {
+  const fetchProduct = async () => {
     try {
       const response = await axios.get(apiUrlProduct);
       setSearchResults(response.data.map((product) => ({ id: product.id, name: product.name })));
-    } catch (error) {
-      console.error('Erro ao buscar nomes de produtos:', error);
-      setNotification('Erro ao buscar nomes de produtos. Por favor, tente novamente.');
-    }
-  };
-
-
-  const fetchInvetory = async () => {
-    try {
-      const response = await axios.get(apiUrlProduct);
-      setSearchResultsInventory(response.data.map((product) => ({ id: product.id, name: product.name })));
     } catch (error) {
       console.error('Erro ao buscar nomes de produtos:', error);
       setNotification('Erro ao buscar nomes de produtos. Por favor, tente novamente.');
@@ -184,10 +171,10 @@ function Inventories() {
               <Card key={inventory.id} style={{ margin: '10px', minWidth: '200px' }}>
                 <CardContent>
                   <Typography variant="body1" component="div">
-                   {inventory.product}
+                   {inventory.name}
                   </Typography>
                   <Typography variant="body1" component="div">
-                    {inventory.in_inventory_at}
+                    Estoque Atual {inventory.inventories_amount}
                   </Typography>
                 </CardContent>
                 <CardActions>
@@ -204,26 +191,22 @@ function Inventories() {
         </div>
       )}
 
-
-      
       <div style={{ marginTop: '30px' }}>
         <form onSubmit={handleSubmit}>
-            
           <Typography variant="h5" gutterBottom>
             Cadastro de Estoque
           </Typography>
-          
-        <Autocomplete
-          fullWidth
-          options={searchResults}
-          value={selectedProduct}
-          onChange={(event, newValue) => {
-            setSelectedProduct(newValue);
-            setProduct({ ...product, product: newValue ? newValue.id : '' });
-          }}
-          getOptionLabel={(option) => option.name}
-          renderInput={(params) => <TextField {...params} label="Produto" />}
-        />
+          <Autocomplete
+            fullWidth
+            options={searchResults}
+            value={selectedProduct}
+            onChange={(event, newValue) => {
+              setSelectedProduct(newValue);
+              setProduct({ ...product, product: newValue ? newValue.id : '' });
+            }}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => <TextField {...params} label="Produto" />}
+          />
           <TextField
             required
             fullWidth

@@ -2,12 +2,20 @@
 import './App.css';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-
-
+import Sighin from './Pages/Sighin';
+import { useState } from 'react';
 import {Outlet} from "react-router-dom"
 
+
 function App() {
- 
+  
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login state
+
+  
+  const handleLoginSuccess = (isLoginSuccessful) => {
+    setIsLoggedIn(isLoginSuccessful);
+  };
+
   return (
     <div style={styles.body}>
     <div style={styles.mainLayout}>
@@ -22,7 +30,17 @@ function App() {
       
     </div>
     <main style={styles.content}>
-      <Outlet />
+    {isLoggedIn ? (
+              <Outlet /> 
+            ) : (
+              <>
+                <h2>Please Login</h2>
+                <div style={styles.loginSignupContainer}>
+                  <Sighin onLoginSuccess={handleLoginSuccess} />
+                 
+                </div>
+              </>
+            )}
     </main>
    </div>
    </div>
@@ -71,6 +89,13 @@ const styles = {
     padding: '20px',
      
   },
+  loginSignupContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+   
+  }
 
   // Estilos específicos dos componentes podem ser adicionados aqui
 };

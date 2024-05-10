@@ -112,7 +112,7 @@ function Dashboard() {
               Produtos em Estoque
             </Typography>
             <Typography variant="h4" component="div">
-              {EstoqueTotalAtivo}
+              5
             </Typography>
           </CardContent>
         </Card>
@@ -125,7 +125,7 @@ function Dashboard() {
               Faturamento Mensal
             </Typography>
             <Typography variant="h4" component="div">
-              R$ {TotalVendidoNoMes}
+              R$ 1000,00
             </Typography>
           </CardContent>
         </Card>

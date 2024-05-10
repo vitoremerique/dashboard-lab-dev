@@ -1,71 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, AreaChart, Area, ResponsiveContainer } from 'recharts';
-import axios from 'axios';
-import URLs from './config';
+
 function Sales() {
-  const [salesData, setSalesData] = useState([]);
-  const url = URLs.apiUrl
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(url+'api/transactions');
-        const salesInventories = response.data;
+  const [salesData, setSalesData] = useState({
+    barChartData: [
+      { category: 'Arroz', vendas: 100 },
+      { category: 'Macarrão', vendas: 70 },
+      { category: 'Frango', vendas: 80 },
+    ],
+    pieChartData: [
+      { name: 'Frios', vendas: 40 },
+      { name: 'Limpeza', vendas: 35 },
+      { name: 'Carnes', vendas: 25 },
+    ],
+    areaChartData: [
+      { date: '2024-03-01', vendas: 250 },
+      { date: '2024-04-01', vendas: 350 },
+      { date: '2024-05-01', vendas: 3200 },
+    ],
+  });
 
-        // Mapear os dados para os formatos necessários para cada gráfico
-        const barChartData = [];
-        const pieChartData = [];
-        const areaChartData = [];
-
-        salesInventories.forEach(sale => {
-          sale.products.forEach(product => {
-            const categoryName = product.product.category.name;
-            const quantitySold = product.quantity;
-
-            // Atualizar dados do gráfico de barras por categoria
-            const existingBarData = barChartData.find(item => item.categoria === categoryName);
-            if (existingBarData) {
-              existingBarData.vendas += quantitySold;
-            } else {
-              barChartData.push({ categoria: categoryName, vendas: quantitySold });
-            }
-
-            // Atualizar dados do gráfico de pizza por categoria
-            const existingPieData = pieChartData.find(item => item.name === categoryName);
-            if (existingPieData) {
-              existingPieData.vendas += quantitySold;
-            } else {
-              pieChartData.push({ name: categoryName, vendas: quantitySold });
-            }
-
-            // Atualizar dados do gráfico de área
-            const saleDate = new Date(sale.datetime);
-            const areaDate = `${saleDate.getFullYear()}-${saleDate.getMonth() + 1}-01`;
-            const existingAreaData = areaChartData.find(item => item.date === areaDate);
-            if (existingAreaData) {
-              existingAreaData.vendas += quantitySold;
-            } else {
-              areaChartData.push({ date: areaDate, vendas: quantitySold });
-            }
-          });
-        });
-
-        setSalesData({ barChartData, pieChartData, areaChartData });
-      } catch (error) {
-        console.error('Erro ao obter dados da API:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px' }}>
       <div style={{ flex: 1 }}>
-        <h2>Gráfico de Barras por categoria</h2>
+        <h2>Top 3 produtos mais vendidos</h2>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={salesData.barChartData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="categoria" />
+            <XAxis dataKey="category" />
             <YAxis />
             <Tooltip />
             <Legend />
@@ -74,7 +38,7 @@ function Sales() {
         </ResponsiveContainer>
       </div>
       <div style={{ flex: 1 }}>
-        <h2>Gráfico de Pizza por categoria</h2>
+        <h2>Top 3 categorias mais vendidas</h2>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie data={salesData.pieChartData} dataKey="vendas" nameKey="name" fill="#2196f3" label />
@@ -83,7 +47,7 @@ function Sales() {
         </ResponsiveContainer>
       </div>
       <div style={{ flex: 1 }}>
-        <h2>Gráfico de Área </h2>
+        <h2>Vendas mensais</h2>
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={salesData.areaChartData}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -99,3 +63,4 @@ function Sales() {
 }
 
 export default Sales;
+
